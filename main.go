@@ -33,6 +33,15 @@ func main() {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-	image.Print()
+	image.Rotate(deg)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+	if output != "" {
+		image.WriteToFile(output)
+	} else {
+		image.Print()
+	}
 
 }

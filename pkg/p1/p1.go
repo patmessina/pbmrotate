@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"os"
 	"strconv"
 	"strings"
 )
@@ -117,6 +118,76 @@ func CreateImage(data []byte, col, row int) ([][]bool, error) {
 	return image, nil
 }
 
+// Rotates the image
+func (img *P1Image) Rotate(deg int) error {
+
+	if deg%90 != 0 {
+		msg := "cannot rotate " + strconv.Itoa(deg) + " degrees"
+		return errors.New(msg)
+	}
+
+	if deg%360 == 0 {
+	} else if deg%270 == 0 {
+		img.rotate(false)
+	} else if deg%180 == 0 {
+		img.flip()
+	} else if deg%90 == 0 {
+		img.rotate(true)
+	} else {
+		return errors.New("If you are here, I suck at math.")
+	}
+	return nil
+}
+
+// rotate - rotate Data clockwise or counter clockwise 90 deg
+func (img *P1Image) rotate(clockwise bool) {
+	rotatedImage := make([][]bool, img.Col)
+	for i := 0; i < img.Col; i++ {
+		rotatedImage[i] = make([]bool, img.Row)
+	}
+
+	imgDataRow := img.Row - 1
+	imgDataCol := img.Col - 1
+	for i := 0; i < img.Row; i++ {
+		for j := 0; j < img.Col; j++ {
+			if clockwise {
+				rotatedImage[j][imgDataRow-i] = img.Data[i][j]
+			} else {
+				rotatedImage[imgDataCol-j][i] = img.Data[i][j]
+			}
+		}
+	}
+	img.Data = rotatedImage
+}
+
+// flip will rotate Data by 180 degrees
+func (img *P1Image) flip() {
+	i := 0
+	j := img.Row - 1
+	// swap rows
+	for {
+		if i >= j {
+			break
+		}
+		img.Data[i], img.Data[j] = img.Data[j], img.Data[i]
+		i++
+		j--
+	}
+	// swap col
+	for r := 0; r < len(img.Data); r++ {
+		i = 0
+		j = img.Col - 1
+		for {
+			if i >= j {
+				break
+			}
+			img.Data[r][i], img.Data[r][j] = img.Data[r][j], img.Data[r][i]
+			i++
+			j--
+		}
+	}
+}
+
 // getFormatedData formats data into a string that we can write to
 // stdout or disk
 func (img *P1Image) getFormatedData() strings.Builder {
@@ -144,4 +215,11 @@ func (img *P1Image) getFormatedData() strings.Builder {
 func (img *P1Image) Print() {
 	builder := img.getFormatedData()
 	fmt.Println(builder.String())
+}
+
+// WriteToFile will write to a give path
+func (img *P1Image) WriteToFile(path string) {
+	builder := img.getFormatedData()
+	whatever := []byte(builder.String())
+	os.WriteFile(path, whatever, 666)
 }
