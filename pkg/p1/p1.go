@@ -33,6 +33,13 @@ func NewImage(content []byte) (*P1Image, error) {
 	i := 0
 	// we want to make sure to skip any comments and blank lines
 	for ; i < len(lines); i++ {
+
+		// check if file is completely empty
+		if len(lines[i]) == i && (len(lines[i]) == 0 || lines[i][0] == '#') {
+			return nil, errors.New("file is not the correct format")
+		}
+
+		// ignore newlines or comments
 		if len(lines[i]) == 0 || lines[i][0] == '#' {
 			continue
 		}
@@ -194,8 +201,8 @@ func (img *P1Image) getFormatedData() strings.Builder {
 	builder := strings.Builder{}
 
 	builder.WriteString("P1\n")
-	size := strconv.Itoa(len(img.Data[0])) + " " +
-		strconv.Itoa(len(img.Data)) + " \n"
+	size := strconv.Itoa(img.Col) + " " +
+		strconv.Itoa(img.Row) + " \n"
 	builder.WriteString(size)
 	for _, r := range img.Data {
 		for _, v := range r {
