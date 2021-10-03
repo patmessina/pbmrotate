@@ -4,6 +4,8 @@ import (
 	"flag"
 	"fmt"
 	"os"
+
+	"github.com/patmessina/pbmrotate/pkg/p1"
 )
 
 var (
@@ -25,5 +27,12 @@ func main() {
 		flag.PrintDefaults()
 		os.Exit(1)
 	}
+
+	image, err := p1.NewImageFromFile(input)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+	image.Print()
 
 }
