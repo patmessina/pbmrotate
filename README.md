@@ -5,15 +5,24 @@ to rotate, and will print to stdout or write the image to disk.
 
 > Currently only supports P1 formatted PBM images.
 
-# Installation
+# Build From Source
 
-TODO
+Requires go 1.17. With make run
 
-## Build From Source
+```bash
+make
+```
 
-TODO
+Or to just build with go
+
+```bash
+go build -o bin/pbmrotate
+```
 
 # Example Usage
+
+The following will rotate the image `example.pbm` 180 degrees and write it to
+`example_flip.pbm`.
 
 ```bash
 pbmrotate -i example.pbm -d 180 -o example_flip.pbm
