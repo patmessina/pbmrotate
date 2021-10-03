@@ -16,7 +16,7 @@ TODO
 # Example Usage
 
 ```bash
-pbmrotate example.pbm 180 -o example_flip.pbm
+pbmrotate -i example.pbm -d 180 -o example_flip.pbm
 ```
 
 # PBM Image
