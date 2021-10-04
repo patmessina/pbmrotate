@@ -1,12 +1,12 @@
 package p1
 
 import (
+	"strings"
 	"testing"
 )
 
 var (
 	letterJ string = `P1
-# This is an example bitmap of the letter "J"
 6 10
 0 0 0 0 1 0
 0 0 0 0 1 0
@@ -341,7 +341,37 @@ func TestRotate(t *testing.T) {
 }
 
 func TestGetFormatedData(t *testing.T) {
-}
 
-func TestWriteToFile(t *testing.T) {
+	tcs := []struct {
+		Input    P1Image
+		Expected string
+	}{
+		{
+			Input: P1Image{
+				Row:  jRow,
+				Col:  jCol,
+				Data: letterJData,
+			},
+			Expected: letterJ,
+		},
+	}
+
+	for _, c := range tcs {
+		builder := c.Input.getFormatedData()
+		output := strings.Split(builder.String(), "\n")
+		expected := strings.Split(c.Expected, "\n")
+		if len(output) != len(expected) {
+			t.Errorf("file length is not the same output %v, and expected %v",
+				len(output), len(expected))
+			break
+		}
+		for i, l := range output {
+			if l != expected[i] {
+				t.Errorf("line '%v' does not match expected '%v'",
+					l, expected[i])
+				break
+			}
+		}
+	}
+
 }

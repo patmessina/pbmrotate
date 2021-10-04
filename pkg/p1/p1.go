@@ -214,17 +214,24 @@ func (img *P1Image) getFormatedData() strings.Builder {
 
 	builder.WriteString("P1\n")
 	size := strconv.Itoa(img.Col) + " " +
-		strconv.Itoa(img.Row) + " \n"
+		strconv.Itoa(img.Row) + "\n"
 	builder.WriteString(size)
-	for _, r := range img.Data {
-		for _, v := range r {
+	for i, r := range img.Data {
+		for j, v := range r {
 			if v {
-				builder.WriteString("1 ")
+				builder.WriteString("1")
 			} else {
-				builder.WriteString("0 ")
+				builder.WriteString("0")
+			}
+			// append space between elements
+			if j < len(r)-1 {
+				builder.WriteString(" ")
 			}
 		}
-		builder.WriteByte('\n')
+		// add newline at the end of each row
+		if i < len(img.Data)-1 {
+			builder.WriteByte('\n')
+		}
 	}
 
 	return builder
