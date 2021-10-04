@@ -135,11 +135,22 @@ func (img *P1Image) Rotate(deg int) error {
 
 	if deg%360 == 0 {
 	} else if deg%270 == 0 {
-		img.rotate(false)
+		// if negative rotate right
+		if deg < 0 {
+			img.rotate(true)
+		} else {
+			img.rotate(false)
+		}
 	} else if deg%180 == 0 {
 		img.flip()
 	} else if deg%90 == 0 {
-		img.rotate(true)
+		// if negative rotate left
+		if deg < 0 {
+			img.rotate(false)
+		} else {
+			img.rotate(true)
+		}
+
 	} else {
 		return errors.New("If you are here, I suck at math.")
 	}
@@ -165,6 +176,7 @@ func (img *P1Image) rotate(clockwise bool) {
 		}
 	}
 	img.Data = rotatedImage
+	img.Row, img.Col = img.Col, img.Row
 }
 
 // flip will rotate Data by 180 degrees
