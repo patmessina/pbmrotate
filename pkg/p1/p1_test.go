@@ -19,6 +19,10 @@ var (
 0 0 0 0 0 0
 0 0 0 0 0 0`
 
+	jCol             int    = 6
+	jRow             int    = 10
+	letterJByteSlice []byte = []byte("000010000010000010000010000010000010100010011100000000000000")
+
 	letterJExpected [][]bool = [][]bool{
 		{false, false, false, false, true, false},
 		{false, false, false, false, true, false},
@@ -122,6 +126,57 @@ func TestNewImageFromFile(t *testing.T) {
 }
 
 func TestCreateImage(t *testing.T) {
+	tcs := []struct {
+		Input    []byte
+		Col      int
+		Row      int
+		Expected [][]bool
+	}{
+		{
+			Input:    letterJByteSlice,
+			Col:      jCol,
+			Row:      jRow,
+			Expected: letterJExpected,
+		},
+		{
+			Input:    []byte("1"),
+			Col:      1,
+			Row:      1,
+			Expected: [][]bool{{true}},
+		},
+		{
+			Input:    []byte(""),
+			Col:      0,
+			Row:      0,
+			Expected: [][]bool{},
+		},
+	}
+
+	for _, c := range tcs {
+		output, err := CreateImage(c.Input, c.Col, c.Row)
+		if err != nil {
+			t.Error(err)
+			break
+		}
+
+		if len(output) != len(c.Expected) {
+			t.Errorf("output col size %v does not match expected %v",
+				len(output), len(c.Expected))
+		}
+		for i, expectedRow := range c.Expected {
+			if len(output[i]) != len(expectedRow) {
+				t.Errorf("output row size %v does not match expected %v",
+					len(output), len(c.Expected))
+			}
+			for j, val := range expectedRow {
+				// Actual value test
+				if output[i][j] != val {
+					t.Errorf("Expected %v received %v at index [%v][%v]",
+						val, output[i][j], i, j)
+				}
+			}
+		}
+	}
 }
 
 func TestRotate(t *testing.T) {
