@@ -23,7 +23,7 @@ var (
 	jRow             int    = 10
 	letterJByteSlice []byte = []byte("000010000010000010000010000010000010100010011100000000000000")
 
-	letterJExpected [][]bool = [][]bool{
+	letterJData [][]bool = [][]bool{
 		{false, false, false, false, true, false},
 		{false, false, false, false, true, false},
 		{false, false, false, false, true, false},
@@ -34,6 +34,34 @@ var (
 		{false, true, true, true, false, false},
 		{false, false, false, false, false, false},
 		{false, false, false, false, false, false}}
+
+	letterJDataFlip [][]bool = [][]bool{
+		{false, false, false, false, false, false},
+		{false, false, false, false, false, false},
+		{false, false, true, true, true, false},
+		{false, true, false, false, false, true},
+		{false, true, false, false, false, false},
+		{false, true, false, false, false, false},
+		{false, true, false, false, false, false},
+		{false, true, false, false, false, false},
+		{false, true, false, false, false, false},
+		{false, true, false, false, false, false}}
+
+	letterJDataCounterClock [][]bool = [][]bool{
+		{false, false, false, false, false, false, false, false, false, false},
+		{true, true, true, true, true, true, true, false, false, false},
+		{false, false, false, false, false, false, false, true, false, false},
+		{false, false, false, false, false, false, false, true, false, false},
+		{false, false, false, false, false, false, false, true, false, false},
+		{false, false, false, false, false, false, true, false, false, false}}
+
+	letterJDataClock [][]bool = [][]bool{
+		{false, false, false, true, false, false, false, false, false, false},
+		{false, false, true, false, false, false, false, false, false, false},
+		{false, false, true, false, false, false, false, false, false, false},
+		{false, false, true, false, false, false, false, false, false, false},
+		{false, false, false, true, true, true, true, true, true, true},
+		{false, false, false, false, false, false, false, false, false, false}}
 )
 
 func TestNewImagePass(t *testing.T) {
@@ -58,7 +86,7 @@ func TestNewImagePass(t *testing.T) {
 			Expected: &P1Image{
 				Row:  1,
 				Col:  1,
-				Data: letterJExpected,
+				Data: letterJData,
 			},
 		},
 		// check empty value
@@ -136,7 +164,7 @@ func TestCreateImage(t *testing.T) {
 			Input:    letterJByteSlice,
 			Col:      jCol,
 			Row:      jRow,
-			Expected: letterJExpected,
+			Expected: letterJData,
 		},
 		{
 			Input:    []byte("1"),
@@ -179,10 +207,137 @@ func TestCreateImage(t *testing.T) {
 	}
 }
 
+// Here, passing a pointer to P1Image.Data -- which means tests wont pass without
 func TestRotate(t *testing.T) {
-}
+	tcs := []struct {
+		Input      P1Image
+		Degree     int
+		Expected   P1Image
+		ShouldPass bool
+	}{
+		{
+			Input: P1Image{
+				Row:  jRow,
+				Col:  jCol,
+				Data: letterJData,
+			},
+			Degree: 90,
+			Expected: P1Image{
+				// col and row should be switched here
+				Row:  jCol,
+				Col:  jRow,
+				Data: letterJDataClock,
+			},
+			ShouldPass: true,
+		},
+		{
+			Input: P1Image{
+				Row:  jRow,
+				Col:  jCol,
+				Data: letterJData,
+			},
+			Degree: -270,
+			Expected: P1Image{
+				// col and row should be switched here
+				Col:  jRow,
+				Row:  jCol,
+				Data: letterJDataClock,
+			},
+			ShouldPass: true,
+		},
+		{
+			Input: P1Image{
+				Row:  jRow,
+				Col:  jCol,
+				Data: letterJData,
+			},
+			Degree: -90,
+			Expected: P1Image{
+				// col and row should be switched here
+				Col:  jRow,
+				Row:  jCol,
+				Data: letterJDataCounterClock,
+			},
+			ShouldPass: true,
+		},
+		{
+			Input: P1Image{
+				Row:  jRow,
+				Col:  jCol,
+				Data: letterJData,
+			},
+			Degree: 180,
+			Expected: P1Image{
+				Row:  jRow,
+				Col:  jCol,
+				Data: letterJDataFlip,
+			},
+			ShouldPass: true,
+		},
+		{
+			Input: P1Image{
+				Row:  jRow,
+				Col:  jCol,
+				Data: letterJData,
+			},
+			Degree: -180,
+			Expected: P1Image{
+				Row:  jRow,
+				Col:  jCol,
+				Data: letterJDataFlip,
+			},
+			ShouldPass: true,
+		},
+	}
 
-func TestFlip(t *testing.T) {
+	for _, c := range tcs {
+		err := c.Input.Rotate(c.Degree)
+		if err != nil && c.ShouldPass {
+			t.Error(err)
+			break
+		}
+
+		// check col and row
+		if c.Input.Col != c.Expected.Col {
+			t.Errorf("specified input col size %v does not match expected %v",
+				c.Input.Col, c.Expected.Col)
+			break
+		}
+		if c.Input.Row != c.Expected.Row {
+			t.Errorf("specified input Row size %v does not match expected %v",
+				c.Input.Row, c.Expected.Row)
+			break
+		}
+
+		// check if values are in the correct place
+		output := c.Input.Data
+		expected := c.Expected.Data
+		if len(output) != len(expected) {
+			t.Errorf("output col size %v does not match expected %v",
+				len(output), len(expected))
+			break
+		}
+		for i, expectedRow := range expected {
+			if len(output[i]) != len(expectedRow) {
+				t.Errorf("output row size %v does not match expected %v",
+					len(output), len(expected))
+				break
+			}
+			for j, val := range expectedRow {
+				// Actual value test
+				if output[i][j] != val {
+					t.Errorf("Expected %v received %v at index [%v][%v]",
+						val, output[i][j], i, j)
+					break
+				}
+			}
+		}
+
+		// TODO: refactor so this is not required
+		c.Input.Rotate(-c.Degree)
+
+	}
+
 }
 
 func TestGetFormatedData(t *testing.T) {
