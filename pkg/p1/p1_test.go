@@ -4,6 +4,34 @@ import (
 	"testing"
 )
 
+var (
+	letterJ string = `P1
+# This is an example bitmap of the letter "J"
+6 10
+0 0 0 0 1 0
+0 0 0 0 1 0
+0 0 0 0 1 0
+0 0 0 0 1 0
+0 0 0 0 1 0
+0 0 0 0 1 0
+1 0 0 0 1 0
+0 1 1 1 0 0
+0 0 0 0 0 0
+0 0 0 0 0 0`
+
+	letterJExpected [][]bool = [][]bool{
+		{false, false, false, false, true, false},
+		{false, false, false, false, true, false},
+		{false, false, false, false, true, false},
+		{false, false, false, false, true, false},
+		{false, false, false, false, true, false},
+		{false, false, false, false, true, false},
+		{true, false, false, false, true, false},
+		{false, true, true, true, false, false},
+		{false, false, false, false, false, false},
+		{false, false, false, false, false, false}}
+)
+
 func TestNewImagePass(t *testing.T) {
 	// Should pass test cases
 	tcs := []struct {
@@ -22,34 +50,11 @@ func TestNewImagePass(t *testing.T) {
 
 		// check example J image
 		{
-			Input: []byte(
-				`P1
-# This is an example bitmap of the letter "J"
-6 10
-0 0 0 0 1 0
-0 0 0 0 1 0
-0 0 0 0 1 0
-0 0 0 0 1 0
-0 0 0 0 1 0
-0 0 0 0 1 0
-1 0 0 0 1 0
-0 1 1 1 0 0
-0 0 0 0 0 0
-0 0 0 0 0 0`),
+			Input: []byte(letterJ),
 			Expected: &P1Image{
-				Row: 1,
-				Col: 1,
-				Data: [][]bool{
-					{false, false, false, false, true, false},
-					{false, false, false, false, true, false},
-					{false, false, false, false, true, false},
-					{false, false, false, false, true, false},
-					{false, false, false, false, true, false},
-					{false, false, false, false, true, false},
-					{true, false, false, false, true, false},
-					{false, true, true, true, false, false},
-					{false, false, false, false, false, false},
-					{false, false, false, false, false, false}},
+				Row:  1,
+				Col:  1,
+				Data: letterJExpected,
 			},
 		},
 		// check empty value
