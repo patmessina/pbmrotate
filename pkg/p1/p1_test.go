@@ -99,6 +99,26 @@ func TestNewImagePass(t *testing.T) {
 }
 
 func TestNewImageFromFile(t *testing.T) {
+	tcs := []struct {
+		Input      string
+		ShouldPass bool
+	}{
+		{
+			Input:      "",
+			ShouldPass: false,
+		},
+		{
+			Input:      "../../examples/j.pbm",
+			ShouldPass: true,
+		},
+	}
+
+	for _, c := range tcs {
+		_, err := NewImageFromFile(c.Input)
+		if err != nil && c.ShouldPass {
+			t.Error(err)
+		}
+	}
 }
 
 func TestCreateImage(t *testing.T) {
