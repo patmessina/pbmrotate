@@ -82,6 +82,7 @@ func TestNewImagePass(t *testing.T) {
 				break
 			}
 			for j, val := range expectedRow {
+				// actually checking that the values are the same
 				if val != image.Data[i][j] {
 					t.Errorf("Expected %v received %v at index [%v][%v]",
 						val, image.Data[i][j], i, j)
